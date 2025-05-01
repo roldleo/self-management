@@ -1,8 +1,13 @@
 'use client'
 
+import { ReactNode } from 'react'
 import { ProtectedRoute } from '@/components/protectedRoute'
 
-export default function DashboardPage({ children }: { children: React.ReactNode }) {
+interface DashboardPageProps {
+    children: ReactNode
+}
+
+export default function DashboardPage({ children }: DashboardPageProps) {
     return (
         <ProtectedRoute>
             <div className="flex min-h-screen">
