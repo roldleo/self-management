@@ -1,19 +1,8 @@
-'use client'
-
-import { ReactNode } from 'react'
-import { ProtectedRoute } from '@/components/protectedRoute'
-
-export default function DashboardPage({ children }: { children: ReactNode }) {
+export default function DashboardPage() {
     return (
-        <ProtectedRoute>
-            <div className="flex min-h-screen">
-                {/* Main content */}
-                <main className="flex-1 p-6">
-                    <h2 className="text-2xl font-bold mb-6">Self Management</h2>
-                    <p>Aplikasi ini merupakan tugas final dari mata kuliah Pemrograman Web 2</p>
-                    {children}
-                </main>
-            </div>
-        </ProtectedRoute>
+        <div>
+            <h2 className="text-2xl font-bold mb-6">Self Management</h2>
+            <p>Aplikasi ini merupakan tugas final dari mata kuliah Pemrograman Web 2</p>
+        </div>
     )
 }
