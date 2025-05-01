@@ -4,8 +4,14 @@ import { useEffect, useState } from 'react'
 import { getTodos, addTodo, markDone, Delete } from '@/lib/todos'
 import { ProtectedRoute } from '@/components/protectedRoute'
 
+type Todo = {
+    id: string
+    title: string
+    is_done: boolean
+}
+
 export default function TodosPage() {
-    const [todos, setTodos] = useState<any[]>([])
+    const [todos, setTodos] = useState<Todo[]>([])
     const [newTodo, setNewTodo] = useState('')
 
     useEffect(() => {

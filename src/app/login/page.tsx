@@ -1,6 +1,6 @@
 'use client' // Pastikan komponen ini dijalankan di sisi klien
 
-import { useState, FormEvent } from 'react'
+import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,8 +35,12 @@ const LoginPage = () => {
             } else {
                 setError('Invalid login credentials')
             }
-        } catch (error: any) {
-            setError(error.message)
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message)
+            } else {
+                setError('Unknown error occurred')
+            }
         }
     }
 

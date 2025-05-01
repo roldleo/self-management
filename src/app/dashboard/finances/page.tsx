@@ -7,11 +7,20 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button'
 import TransactionChart from '@/components/TransactionChart'
 
+type Transaction = {
+    id: string
+    title: string
+    amount: number
+    type: 'pendapatan' | 'pengeluaran'
+    category: string | null
+    created_at: string // Pastikan ada created_at di sini
+}
+
 export default function TransactionPage() {
-    const [transaction, setTransaction] = useState<any[]>([])
+    const [transaction, setTransaction] = useState<Transaction[]>([])
     const [title, setTitle] = useState('')
     const [amount, setAmount] = useState('')
-    const [type, setType] = useState('pendapatan')
+    const [type, setType] = useState<'pendapatan' | 'pengeluaran'>('pendapatan') // Pastikan tipe ini hanya bisa 'pendapatan' atau 'pengeluaran'
     const [category, setCategory] = useState('')
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editId, setEditId] = useState<string | null>(null)
@@ -50,7 +59,7 @@ export default function TransactionPage() {
         setTransaction(updated)
     }
 
-    const handleEdit = (item: any) => {
+    const handleEdit = (item: Transaction) => {
         setEditId(item.id)
         setTitle(item.title)
         setAmount(item.amount.toString())
@@ -100,7 +109,7 @@ export default function TransactionPage() {
                                     className="w-full p-2 border rounded-md mt-2"
                                     inputMode="numeric"
                                 />
-                                <select value={type} onChange={(e) => setType(e.target.value)} className="w-full p-2 border rounded-md mt-2">
+                                <select value={type} onChange={(e) => setType(e.target.value as 'pendapatan' | 'pengeluaran')} className="w-full p-2 border rounded-md mt-2">
                                     <option value="pendapatan">Pendapatan</option>
                                     <option value="pengeluaran">Pengeluaran</option>
                                 </select>

@@ -2,12 +2,13 @@
 'use client' // Pastikan komponen ini dijalankan di sisi klien
 
 import './globals.css'
+import type { User } from '@supabase/supabase-js'
 import Navbar from '@/components/Navbar'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<any>(null)
+    const [user, setUser] = useState<User | null>(null)
 
     useEffect(() => {
         const getSession = async () => {

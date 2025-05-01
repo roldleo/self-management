@@ -4,18 +4,15 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { User } from '@supabase/supabase-js'
 
-interface NavbarProps {
-    user: any
-}
-
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ user }: { user: User | null }) {
     const [displayName, setDisplayName] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchProfile = async () => {
             if (user) {
-                const { data, error } = await supabase.from('profiles').select('display_name').eq('id', user.id).single()
+                const { data } = await supabase.from('profiles').select('display_name').eq('id', user.id).single()
 
                 if (data) {
                     setDisplayName(data.display_name)

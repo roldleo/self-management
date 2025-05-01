@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert } from '@/components/ui/alert'
 
 const SignupPage = () => {
     const [email, setEmail] = useState('')
@@ -44,8 +44,12 @@ const SignupPage = () => {
 
                 router.push('/login')
             }
-        } catch (error: any) {
-            setError(error.message)
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message)
+            } else {
+                setError('Unknown error occurred')
+            }
         }
     }
 
