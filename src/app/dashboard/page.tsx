@@ -3,11 +3,7 @@
 import { ReactNode } from 'react'
 import { ProtectedRoute } from '@/components/protectedRoute'
 
-interface DashboardPageProps {
-    children: ReactNode
-}
-
-export default function DashboardPage({ children }: DashboardPageProps) {
+export default function DashboardPage({ children }: { children: ReactNode }) {
     return (
         <ProtectedRoute>
             <div className="flex min-h-screen">
