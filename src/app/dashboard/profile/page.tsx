@@ -9,14 +9,15 @@ export default function ProfilePage() {
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [isEditing, setIsEditing] = useState(false)
+    const [userId, setUserId] = useState<string | null>(null)
 
-    // Ambil data profil pengguna saat pertama kali halaman dimuat
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const profile = await getProfile()
                 if (profile && profile.length > 0) {
-                    const { display_name, phone } = profile[0] // Ambil data profil pertama (karena biasanya hanya ada 1)
+                    const { id, display_name, phone } = profile[0]
+                    setUserId(id)
                     setName(display_name)
                     setPhone(phone)
                 }
@@ -29,7 +30,9 @@ export default function ProfilePage() {
 
     // Update data profil pengguna
     const handleSave = async () => {
-        const updatedData = { display_name: name, phone }
+        if (!userId) return
+
+        const updatedData = { id: userId, display_name: name, phone }
 
         try {
             await updateUser(updatedData)

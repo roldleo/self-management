@@ -3,7 +3,18 @@
 import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-const getFilteredData = (data: any[], filter: string) => {
+// Tentukan tipe untuk Transaction
+type Transaction = {
+    id: string
+    title: string
+    amount: number
+    type: 'pendapatan' | 'pengeluaran'
+    category: string | null
+    created_at: string // pastikan ini sesuai dengan tipe data di database
+}
+
+// Menambahkan tipe data untuk parameter 'data'
+const getFilteredData = (data: Transaction[], filter: string) => {
     const now = new Date()
     return data.filter((item) => {
         const date = new Date(item.created_at)
@@ -20,7 +31,7 @@ const getFilteredData = (data: any[], filter: string) => {
     })
 }
 
-export default function TransactionChart({ transaction }: { transaction: any[] }) {
+export default function TransactionChart({ transaction }: { transaction: Transaction[] }) {
     const [filter, setFilter] = useState('hari')
     const [chartData, setChartData] = useState([
         { name: 'Pemasukan', total: 0 },
