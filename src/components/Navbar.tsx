@@ -28,8 +28,8 @@ export default function Navbar({ user }: NavbarProps) {
 
     return (
         <nav className="flex items-center justify-between p-4 border-b">
-            <Link href="/" className="text-2xl font-bold">
-                MyApp
+            <Link href="/dashboard" className="text-2xl font-bold">
+                Self Management
             </Link>
             <div className="flex items-center gap-4">
                 {user ? (
