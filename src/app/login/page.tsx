@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '../AuthContext'
 
 const LoginPage = () => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [error, setError] = useState<string>('')
     const router = useRouter()
+    const { setDisplayName, setIsAuthenticated } = useAuth()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -43,6 +45,8 @@ const LoginPage = () => {
                 // Simpan token ke localStorage atau cookie
                 localStorage.setItem('uuid', user.id)
                 localStorage.setItem('access_token', access_token)
+                setDisplayName(user.email) // Bisa disesuaikan dengan nama pengguna
+                setIsAuthenticated(true)
 
                 // Redirect ke halaman dashboard
                 router.push('/dashboard')

@@ -1,42 +1,50 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { getProfile } from '@/lib/profile'
+import { useAuth } from '@/app/AuthContext'
 
 export default function Navbar() {
-    const [displayName, setDisplayName] = useState<string | null>(null)
+    const { displayName, setDisplayName, isAuthenticated, setIsAuthenticated } = useAuth()
 
     useEffect(() => {
-        // Fungsi untuk mengecek login status
-        const fetchData = async () => {
-            try {
+        if (typeof window !== 'undefined') {
+            const fetchData = async () => {
                 const token = localStorage.getItem('access_token')
                 if (token) {
-                    // Ambil data profil dari API
-                    const profile = await getProfile()
-                    if (profile && profile.length > 0) {
-                        const { display_name } = profile[0]
-                        setDisplayName(display_name)
+                    try {
+                        // Ambil data profil setelah login
+                        const profile = await getProfile()
+                        if (profile && profile.length > 0) {
+                            const { display_name } = profile[0]
+                            setDisplayName(display_name)
+                            setIsAuthenticated(true)
+                        }
+                    } catch (error) {
+                        console.error('Error fetching profile data:', error)
+                        setDisplayName(null)
+                        setIsAuthenticated(false)
                     }
                 } else {
                     setDisplayName(null)
+                    setIsAuthenticated(false)
                 }
-            } catch (error) {
-                console.error('Error fetching profile data:', error)
-                setDisplayName(null)
             }
-        }
 
-        fetchData() // Fetch data ketika komponen dirender ulang
-    }, [localStorage.getItem('access_token')]) // Tambahkan dependency untuk memantau perubahan token
+            fetchData()
+        }
+    }, [setDisplayName, setIsAuthenticated])
 
     const handleLogout = () => {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('uuid')
-        setDisplayName(null) // Reset state displayName saat logout
-        window.location.href = '/login' // Redirect ke halaman login
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('access_token')
+            localStorage.removeItem('uuid')
+        }
+        setDisplayName(null)
+        setIsAuthenticated(false)
+        window.location.href = '/login'
     }
 
     return (
@@ -45,7 +53,7 @@ export default function Navbar() {
                 Self Management
             </Link>
             <div className="flex items-center gap-4">
-                {displayName ? (
+                {isAuthenticated ? (
                     <div className="flex items-center gap-4">
                         <span>Welcome, {displayName}</span>
                         <Button onClick={handleLogout}>Logout</Button>
