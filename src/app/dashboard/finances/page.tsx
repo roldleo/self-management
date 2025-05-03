@@ -41,17 +41,26 @@ export default function TransactionPage() {
     const handleSave = async () => {
         if (!title.trim() || !amount.trim() || (type === 'pengeluaran' && !category)) return
 
-        const data = {
+        const datacreate = {
             title,
             amount: parseFloat(amount),
             type,
             category: type === 'pengeluaran' ? category : null,
+            user_id: localStorage.getItem('uuid') || '',
+        }
+
+        const dataupdate = {
+            title,
+            amount: parseFloat(amount),
+            type,
+            category: type === 'pengeluaran' ? category : null,
+            user_id: localStorage.getItem('uuid') || '',
         }
 
         if (editId) {
-            await updateTransaction(editId, data)
+            await updateTransaction(editId, dataupdate)
         } else {
-            await addTransaction(data)
+            await addTransaction(datacreate)
         }
 
         resetForm()
