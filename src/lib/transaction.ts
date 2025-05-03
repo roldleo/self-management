@@ -1,38 +1,52 @@
-// lib/transaction.ts
-import { supabase } from './supabase'
-
-export async function getTransaction() {
-    const { data, error } = await supabase
-        .from('transaction')
-        .select('*')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-
-    if (error) throw error
-    return data?.map((item) => ({
+type Transaction = {
+    id: string
+    title: string
+    amount: number
+    type: 'pendapatan' | 'pengeluaran'
+    category: string | null
+    created_at: string
+    user_id: string
+}
+export async function getTransaction(): Promise<Transaction[]> {
+    const userId = localStorage.getItem('uuid')
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions?userId=${userId}`)
+    if (!res.ok) throw new Error(await res.text())
+    const data: Transaction[] = await res.json()
+    return data.map((item) => ({
         ...item,
-        created_at: item.created_at || new Date().toISOString(), // Pastikan created_at ada
+        created_at: item.created_at || new Date().toISOString(),
     }))
 }
 
-export async function addTransaction(data: { title: string; amount: number; type: 'pendapatan' | 'pengeluaran'; category: string | null }) {
-    const user = (await supabase.auth.getUser()).data.user
-    const { error } = await supabase.from('transaction').insert({
-        ...data,
-        user_id: user?.id, // Pastikan user_id ada
-        created_at: new Date().toISOString(), // Tambahkan created_at
+export async function addTransaction(data: { title: string; amount: number; type: 'pendapatan' | 'pengeluaran'; category: string | null; user_id: string }) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, created_at: new Date().toISOString() }),
     })
-
-    if (error) throw error
+    if (!res.ok) throw new Error(await res.text())
 }
 
-export async function update(id: string, data: { title: string; amount: number; type: 'pendapatan' | 'pengeluaran'; category: string | null }) {
-    const { error } = await supabase.from('transaction').update(data).eq('id', id)
-
-    if (error) throw error
+export async function updateTransaction(
+    id: string,
+    data: {
+        title: string
+        amount: number
+        type: 'pendapatan' | 'pengeluaran'
+        category: string | null
+    }
+) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+    if (!res.ok) throw new Error(await res.text())
 }
 
 export async function deleteTransaction(id: string) {
-    const { error } = await supabase.from('transaction').delete().eq('id', id)
-
-    if (error) throw error
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, {
+        method: 'DELETE',
+    })
+    if (!res.ok) throw new Error(await res.text())
 }

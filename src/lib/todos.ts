@@ -1,30 +1,67 @@
-import { supabase } from './supabase'
-
+// Mendapatkan daftar todos
 export async function getTodos() {
-    const { data, error } = await supabase
-        .from('todos')
-        .select('*')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+    const userId = localStorage.getItem('uuid')
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
 
-    if (error) throw error
+    if (!response.ok) {
+        throw new Error('Failed to fetch todos')
+    }
+
+    const data = await response.json()
     return data
 }
 
+// Menambahkan todo baru
 export async function addTodo(title: string) {
-    const user = (await supabase.auth.getUser()).data.user
-    const { error } = await supabase.from('todos').insert([
-        {
-            title,
-            is_done: false,
-            user_id: user?.id,
+    const userId = localStorage.getItem('uuid')
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
         },
-    ])
-    if (error) throw error
-}
-export async function markDone(id: string) {
-    await supabase.from('todos').update({ is_done: true }).eq('id', id)
+        body: JSON.stringify({ title, userId }),
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to add todo')
+    }
+
+    return await response.json()
 }
 
-export async function Delete(id: string) {
-    await supabase.from('todos').delete().eq('id', id)
+// Menandai todo selesai
+export async function markDone(id: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to mark todo as done')
+    }
+
+    return await response.json()
+}
+
+// Menghapus todo
+export async function deleteTodo(id: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to delete todo')
+    }
+
+    return await response.json()
 }

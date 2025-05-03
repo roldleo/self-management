@@ -2,26 +2,27 @@
 
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { User } from '@supabase/supabase-js'
+import { getProfile } from '@/lib/profile'
 
-export default function Navbar({ user }: { user: User | null }) {
+export default function Navbar() {
     const [displayName, setDisplayName] = useState<string | null>(null)
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            if (user) {
-                const { data } = await supabase.from('profiles').select('display_name').eq('id', user.id).single()
-
-                if (data) {
-                    setDisplayName(data.display_name)
+        const fetchData = async () => {
+            try {
+                const profile = await getProfile()
+                if (profile && profile.length > 0) {
+                    const { display_name } = profile[0]
+                    setDisplayName(display_name)
                 }
+            } catch (error) {
+                console.error('Error fetching profile data:', error)
+                setDisplayName('')
             }
         }
-
-        fetchProfile()
-    }, [user])
+        fetchData()
+    }, [])
 
     return (
         <nav className="flex items-center justify-between p-4 border-b">
@@ -29,12 +30,14 @@ export default function Navbar({ user }: { user: User | null }) {
                 Self Management
             </Link>
             <div className="flex items-center gap-4">
-                {user ? (
+                {displayName ? (
                     <div className="flex items-center gap-4">
-                        <span>Welcome, {displayName ?? user.email}</span>
+                        <span>Welcome, {displayName}</span>
                         <Button
                             onClick={async () => {
-                                await supabase.auth.signOut()
+                                localStorage.removeItem('access_token')
+                                localStorage.removeItem('uuid')
+                                window.location.href = '/login'
                             }}
                         >
                             Logout

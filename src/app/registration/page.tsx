@@ -1,7 +1,6 @@
 'use client' // Tambahkan ini di bagian atas file
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,32 +17,31 @@ const SignupPage = () => {
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault()
+        setError('')
 
-        setError('') // clear error sebelum submit
         try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    displayName,
+                    phone,
+                }),
             })
 
-            if (error) throw error
+            const result = await response.json()
 
-            const user = data?.user
-
-            if (user) {
-                // Insert ke tabel profiles
-                const { error: profileError } = await supabase.from('profiles').insert({
-                    id: user.id,
-                    display_name: displayName,
-                    phone: phone,
-                })
-
-                if (profileError) {
-                    throw profileError
-                }
-
-                router.push('/login')
+            if (!response.ok || result.status === 'error') {
+                setError(result.message || 'Registration failed')
+                return
             }
+
+            // Redirect ke login
+            router.push('/login')
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message)

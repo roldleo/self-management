@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import TransactionChart from '@/components/TransactionChart'
-import { getTransaction, addTransaction, update, deleteTransaction } from '@/lib/transaction'
+import { getTransaction, addTransaction, updateTransaction, deleteTransaction } from '@/lib/transaction'
 
 type Transaction = {
     id: string
@@ -49,7 +49,7 @@ export default function TransactionPage() {
         }
 
         if (editId) {
-            await update(editId, data)
+            await updateTransaction(editId, data)
         } else {
             await addTransaction(data)
         }

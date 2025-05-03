@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getTodos, addTodo, markDone, Delete } from '@/lib/todos'
+import { getTodos, addTodo, markDone, deleteTodo } from '@/lib/todos'
 import { ProtectedRoute } from '@/components/protectedRoute'
 
 type Todo = {
@@ -31,7 +31,7 @@ export default function TodosPage() {
         setTodos(updatedTodos)
     }
     const handleDelete = async (id: string) => {
-        await Delete(id)
+        await deleteTodo(id)
         const updatedTodos = await getTodos()
         setTodos(updatedTodos)
     }

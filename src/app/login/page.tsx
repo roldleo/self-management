@@ -1,7 +1,6 @@
 'use client' // Pastikan komponen ini dijalankan di sisi klien
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,21 +18,34 @@ const LoginPage = () => {
         setError('')
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
             })
 
-            if (error) throw error
+            const data = await response.json()
 
-            const user = data?.user
+            if (!response.ok) {
+                setError(data.message || 'Unknown error occurred')
+                return
+            }
 
-            if (user) {
-                console.log('User logged in:', user)
-                // Misal mau ke dashboard setelah login
+            // Misalnya, kita dapatkan JWT dari NestJS
+            const { access_token, user } = data
+
+            if (access_token && user) {
+                // Simpan token ke localStorage atau cookie
+                localStorage.setItem('uuid', user.id)
+                localStorage.setItem('access_token', access_token)
+
+                // Redirect ke halaman dashboard
                 router.push('/dashboard')
-            } else {
-                setError('Invalid login credentials')
             }
         } catch (error) {
             if (error instanceof Error) {
