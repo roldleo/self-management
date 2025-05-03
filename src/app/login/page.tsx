@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../AuthContext'
+import { getProfile } from '@/lib/profile'
 
 const LoginPage = () => {
     const [email, setEmail] = useState<string>('')
@@ -42,13 +43,16 @@ const LoginPage = () => {
             const { access_token, user } = data
 
             if (access_token && user) {
-                // Simpan token ke localStorage atau cookie
                 localStorage.setItem('uuid', user.id)
                 localStorage.setItem('access_token', access_token)
-                setDisplayName(user.email) // Bisa disesuaikan dengan nama pengguna
-                setIsAuthenticated(true)
 
-                // Redirect ke halaman dashboard
+                const profile = await getProfile()
+                if (profile && profile.length > 0) {
+                    const { display_name } = profile[0]
+                    setDisplayName(display_name)
+                    setIsAuthenticated(true)
+                }
+
                 router.push('/dashboard')
             }
         } catch (error) {
