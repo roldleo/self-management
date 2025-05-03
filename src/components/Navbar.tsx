@@ -9,20 +9,35 @@ export default function Navbar() {
     const [displayName, setDisplayName] = useState<string | null>(null)
 
     useEffect(() => {
+        // Fungsi untuk mengecek login status
         const fetchData = async () => {
             try {
-                const profile = await getProfile()
-                if (profile && profile.length > 0) {
-                    const { display_name } = profile[0]
-                    setDisplayName(display_name)
+                const token = localStorage.getItem('access_token')
+                if (token) {
+                    // Ambil data profil dari API
+                    const profile = await getProfile()
+                    if (profile && profile.length > 0) {
+                        const { display_name } = profile[0]
+                        setDisplayName(display_name)
+                    }
+                } else {
+                    setDisplayName(null)
                 }
             } catch (error) {
                 console.error('Error fetching profile data:', error)
-                setDisplayName('')
+                setDisplayName(null)
             }
         }
-        fetchData()
-    }, [])
+
+        fetchData() // Fetch data ketika komponen dirender ulang
+    }, [localStorage.getItem('access_token')]) // Tambahkan dependency untuk memantau perubahan token
+
+    const handleLogout = () => {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('uuid')
+        setDisplayName(null) // Reset state displayName saat logout
+        window.location.href = '/login' // Redirect ke halaman login
+    }
 
     return (
         <nav className="flex items-center justify-between p-4 border-b">
@@ -33,15 +48,7 @@ export default function Navbar() {
                 {displayName ? (
                     <div className="flex items-center gap-4">
                         <span>Welcome, {displayName}</span>
-                        <Button
-                            onClick={async () => {
-                                localStorage.removeItem('access_token')
-                                localStorage.removeItem('uuid')
-                                window.location.href = '/login'
-                            }}
-                        >
-                            Logout
-                        </Button>
+                        <Button onClick={handleLogout}>Logout</Button>
                     </div>
                 ) : (
                     <>
